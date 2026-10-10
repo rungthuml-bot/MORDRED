@@ -13,9 +13,23 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		print("[MapDoor] Player detected! target_scene: ", target_scene_path)
 		if target_scene_path != "":
+			if not ResourceLoader.exists(target_scene_path):
+				push_error("[MapDoor] Target scene does not exist: " + target_scene_path)
+				return
+			if SceneTransition.is_transitioning:
+				return
 			# เก็บความเร็วผู้เล่นก่อนเปลี่ยนด่านเพื่อให้เดินต่อเนื่อง
 			SceneTransition.player_velocity = body.velocity
-			
+
+			# บันทึกความคืบหน้าไปยังด่านใหม่ และล้างตำแหน่งเช็คพอยต์ของด่านเดิม
+			SaveManager.save_data["current_scene"] = target_scene_path
+			SaveManager.save_data["checkpoint_scene"] = target_scene_path
+			SaveManager.save_data.erase("checkpoint_pos_x")
+			SaveManager.save_data.erase("checkpoint_pos_y")
+			SaveManager.save_data.erase("pos_x")
+			SaveManager.save_data.erase("pos_y")
+			SaveManager.save_game()
+
 			# Call the autoload SceneTransition
 			SceneTransition.change_scene(target_scene_path, 0.5, target_spawn_id)
 		else:

@@ -1,8 +1,8 @@
 [gd_scene format=4 uid="uid://bo4r7ndi7e4m1"]
 
-[ext_resource type="Texture2D" uid="uid://8e83hlavtklv" path="res://assets/Background/background1/PNG/background 4/Plan 3.png" id="1_xcfcc"]
-[ext_resource type="Texture2D" uid="uid://c5g2opxo23ecp" path="res://assets/Background/background1/PNG/background 4/Plan 2.png" id="2_48hld"]
-[ext_resource type="Texture2D" uid="uid://df266ftkhgmdn" path="res://assets/Background/background1/PNG/background 4/Plan 1.png" id="3_l45re"]
+[ext_resource type="Texture2D" uid="uid://8e83hlavtklv" path="res://Assets/Background/background1/PNG/background 4/Plan 3.png" id="1_xcfcc"]
+[ext_resource type="Texture2D" uid="uid://c5g2opxo23ecp" path="res://Assets/Background/background1/PNG/background 4/Plan 2.png" id="2_48hld"]
+[ext_resource type="Texture2D" uid="uid://df266ftkhgmdn" path="res://Assets/Background/background1/PNG/background 4/Plan 1.png" id="3_l45re"]
 [ext_resource type="PackedScene" path="res://scenes/characters/NPCPrincess.tscn" id="5_anwe6"]
 [ext_resource type="PackedScene" uid="uid://renvrfx4w4so" path="res://scenes/enemies/Boss.tscn" id="6_rej77"]
 [ext_resource type="PackedScene" uid="uid://dvj03a3fowopm" path="res://scenes/characters/Mordred.tscn" id="100_player"]

@@ -141,6 +141,12 @@ func _physics_process(delta: float) -> void:
 
 func update_ai_behavior() -> void:
 	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player != null and player.get("is_dead") == true:
+		player = null
+
+	if current_state == State.JUMP:
+		process_jump()
+		return
 
 	if player != null and not is_attacking:
 		var distance_to_player := global_position.distance_to(player.global_position)
@@ -229,6 +235,8 @@ func process_jump() -> void:
 		velocity.x = 0
 
 func _deal_landing_damage() -> void:
+	if is_dying:
+		return
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player and player.has_method("apply_camera_shake"):
 		player.apply_camera_shake(15.0)
@@ -320,7 +328,7 @@ func _reset_attack() -> void:
 # =========================================================
 
 func take_damage(amount: int) -> void:
-	if is_dying:
+	if is_dying or amount <= 0:
 		return
 
 	hp -= amount
@@ -348,6 +356,11 @@ func trigger_enrage() -> void:
 	# เพิ่มสเตตัสความบ้าคลั่ง
 	chase_speed = 130.0
 	attack_cooldown = 1.0
+	attack_timer = attack_cooldown
+	is_attacking = false
+	attack_dealt_damage = false
+	if current_state == State.ATTACK or current_state == State.JUMP:
+		current_state = State.CHASE
 	
 	# เปลี่ยนสีเป็นแดง
 	if anim:
@@ -366,9 +379,18 @@ func apply_knockback() -> void:
 		knockback_timer = KNOCKBACK_DURATION
 
 func die() -> void:
-	died.emit()
+	if is_dying:
+		return
 	is_dying = true
+	is_attacking = false
+	current_state = State.PATROL
 	velocity = Vector2.ZERO
+	collision_layer = 0
+	collision_mask = 0
+	if attack_hitbox:
+		attack_hitbox.monitoring = false
+		attack_hitbox.monitorable = false
+	died.emit()
 
 	if anim:
 		anim.play("Die")

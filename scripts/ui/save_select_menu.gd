@@ -98,19 +98,23 @@ func update_slot_buttons() -> void:
 
 		if SaveManager.is_slot_used(slot_number):
 			var data = SaveManager.get_slot_info(slot_number)
-			var hp: int = data.get("hp", 100)
-			var potions: int = data.get("potion_count", 0)
+			if data.is_empty():
+				# ไฟล์มีอยู่จริงแต่เสียหายหรือไม่สามารถอ่านได้
+				btn.text = "PROFILE " + str(slot_number) + "\n\nCORRUPTED\n\n(Cannot Load)"
+			else:
+				var hp: int = data.get("hp", 100)
+				var potions: int = data.get("potion_count", 0)
 
-			var continue_text = "CONTINUE"
-			var hp_text = "HP: "
-			var potion_text = "Potions: "
-			
-			if has_node("/root/LocaleManager"):
-				var lm = get_node("/root/LocaleManager")
-				continue_text = lm.t("CONTINUE")
-				potion_text = lm.t("POTIONS")
+				var continue_text = "CONTINUE"
+				var hp_text = "HP: "
+				var potion_text = "Potions: "
 				
-			btn.text = "PROFILE " + str(slot_number) + "\n\n" + continue_text + "\n\n" + hp_text + str(hp) + "\n" + potion_text + str(potions)
+				if has_node("/root/LocaleManager"):
+					var lm = get_node("/root/LocaleManager")
+					continue_text = lm.t("CONTINUE")
+					potion_text = lm.t("POTIONS")
+					
+				btn.text = "PROFILE " + str(slot_number) + "\n\n" + continue_text + "\n\n" + hp_text + str(hp) + "\n" + potion_text + str(potions)
 
 			if del_btn != null:
 				del_btn.modulate.a = 1.0
@@ -134,11 +138,21 @@ func update_slot_buttons() -> void:
 
 func _on_slot_pressed(slot: int) -> void:
 
+	if SceneTransition.is_transitioning:
+		return
+
 	if SaveManager.is_slot_used(slot):
 		# เล่นต่อ (CONTINUE) -> โหลดเซฟแล้วสลับฉากเข้าเกม
-		SaveManager.load_game(slot)
-		var target_scene: String = SaveManager.save_data.get("current_scene", SaveManager.default_start_scene)
-		SceneTransition.change_scene(target_scene)
+		if SaveManager.load_game(slot):
+			var target_scene: String = SaveManager.save_data.get("current_scene", SaveManager.default_start_scene)
+			if target_scene != "" and ResourceLoader.exists(target_scene):
+				SceneTransition.change_scene(target_scene)
+			else:
+				SceneTransition.change_scene(SaveManager.default_start_scene)
+		else:
+			# ไฟล์เสียหาย: เก็บไฟล์เดิมไว้เพื่อความปลอดภัย ไม่เขียนทับอัตโนมัติ ผู้เล่นต้องกดลบเองหากต้องการสร้างใหม่
+			push_warning("SaveSelectMenu: Save slot %d failed to load. Preserving existing file; delete slot to start anew." % slot)
+			update_slot_buttons()
 	else:
 		# สร้างเซฟใหม่ (NEW GAME) -> สลับฉากไปหน้าเล่าเรื่อง
 		SaveManager.create_new_save(slot)
@@ -147,11 +161,17 @@ func _on_slot_pressed(slot: int) -> void:
 
 func _on_delete_pressed(slot: int) -> void:
 
+	if SceneTransition.is_transitioning:
+		return
+
 	SaveManager.delete_save(slot)
 	update_slot_buttons()
 
 
 func _on_back_pressed() -> void:
+
+	if SceneTransition.is_transitioning:
+		return
 
 	if main_menu_scene != "" and ResourceLoader.exists(main_menu_scene):
 		SceneTransition.change_scene(main_menu_scene)

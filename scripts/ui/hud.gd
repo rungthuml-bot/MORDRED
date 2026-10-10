@@ -44,8 +44,8 @@ func _ready() -> void:
 func _on_language_changed(_lang: String) -> void:
 	# Trigger label update
 	var player := get_tree().get_first_node_in_group("player") as Node
-	if player != null:
-		_on_potion_count_changed(player.get("potion_count"))
+	if player != null and player.get("potion_count") != null:
+		_on_potion_count_changed(int(player.get("potion_count")))
 
 
 # =========================================================

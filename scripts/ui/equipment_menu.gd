@@ -76,9 +76,14 @@ func _on_language_changed(_lang: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 
 	# กดปุ่ม E เพื่อ เปิด/ปิด หน้าต่างเครื่องราง
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_E:
-			toggle_menu()
+	if event.is_action_pressed("toggle_equipment") or (event is InputEventKey and event.pressed and not event.echo and (event.keycode == KEY_E or event.physical_keycode == KEY_E)):
+		if get_tree().paused and not is_menu_open:
+			return
+		get_viewport().set_input_as_handled()
+		toggle_menu()
+	elif is_menu_open and event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		toggle_menu()
 
 
 func toggle_menu() -> void:

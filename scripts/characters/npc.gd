@@ -16,6 +16,7 @@ extends StaticBody2D
 var player_nearby: bool = false
 
 func _ready() -> void:
+	add_to_group("interactable")
 	prompt_label.visible = false
 	interaction_area.body_entered.connect(_on_interaction_area_body_entered)
 	interaction_area.body_exited.connect(_on_interaction_area_body_exited)
@@ -35,9 +36,14 @@ func _apply_translation() -> void:
 func _on_language_changed(_lang: String) -> void:
 	_apply_translation()
 
+func interact() -> void:
+	if player_nearby:
+		_talk()
+
 func _unhandled_input(event: InputEvent) -> void:
-	if player_nearby and event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode == KEY_T:
+	if player_nearby:
+		if event.is_action_pressed("interact") or (event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_T):
+			get_viewport().set_input_as_handled()
 			_talk()
 
 func _talk() -> void:

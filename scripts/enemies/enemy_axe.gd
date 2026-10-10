@@ -244,7 +244,7 @@ func _reset_attack() -> void:
 # =========================================================
 
 func take_damage(amount: int) -> void:
-	if is_dying:
+	if is_dying or amount <= 0:
 		return
 
 	hp -= amount
@@ -268,8 +268,17 @@ func apply_knockback() -> void:
 		knockback_timer = KNOCKBACK_DURATION
 
 func die() -> void:
+	if is_dying:
+		return
 	is_dying = true
+	is_attacking = false
+	current_state = State.PATROL
 	velocity = Vector2.ZERO
+	collision_layer = 0
+	collision_mask = 0
+	if attack_hitbox:
+		attack_hitbox.monitoring = false
+		attack_hitbox.monitorable = false
 
 	if anim:
 		anim.play("Die")

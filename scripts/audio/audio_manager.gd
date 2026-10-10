@@ -4,9 +4,9 @@ var music_player: AudioStreamPlayer
 var ui_player: AudioStreamPlayer
 var ui_hover_player: AudioStreamPlayer
 var transition_player: AudioStreamPlayer
-var ui_click_sound: AudioStream = preload("res://assets/audio/bgm/universfield-computer-mouse-click-352734.mp3")
-var ui_hover_sound: AudioStream = preload("res://assets/audio/bgm/666herohero-click-21156.mp3")
-var transition_impact_sound: AudioStream = preload("res://assets/audio/bgm/lordsonny-cinematic-boom-171285.mp3")
+var ui_click_sound: AudioStream = preload("res://Assets/audio/bgm/universfield-computer-mouse-click-352734.mp3")
+var ui_hover_sound: AudioStream = preload("res://Assets/audio/bgm/666herohero-click-21156.mp3")
+var transition_impact_sound: AudioStream = preload("res://Assets/audio/bgm/lordsonny-cinematic-boom-171285.mp3")
 
 func _ready() -> void:
 	music_player = AudioStreamPlayer.new()

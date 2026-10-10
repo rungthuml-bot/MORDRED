@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://ddkbjitso8s1x"]
 
 [ext_resource type="Script" uid="uid://cjjvcog3f5mmd" path="res://scripts/items/health_potion.gd" id="1_qn4rg"]
-[ext_resource type="Texture2D" uid="uid://bds0ay46a7y5q" path="res://assets/game/ChatGPT_Image_1_ก.ย._2569_03_45_09-removebg-preview (1).png" id="2_df3ce"]
+[ext_resource type="Texture2D" uid="uid://bds0ay46a7y5q" path="res://Assets/game/ChatGPT_Image_1_ก.ย._2569_03_45_09-removebg-preview (1).png" id="2_df3ce"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7n77a"]
 

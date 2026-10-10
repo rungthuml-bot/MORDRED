@@ -40,9 +40,21 @@ func is_slot_used(slot: int) -> bool:
 # Save, Load & Delete Logic
 # =========================================================
 
+func reset_session_state() -> void:
+
+	is_respawning = false
+	save_data = {
+		"hp": 100,
+		"potion_count": 1,
+		"current_scene": default_start_scene,
+		"equipped_charms": []
+	}
+
+
 func create_new_save(slot: int) -> void:
 
 	current_slot = slot
+	is_respawning = false
 	save_data = {
 		"hp": 100,
 		"potion_count": 1,
@@ -62,6 +74,8 @@ func save_game() -> void:
 		file.store_string(json_string)
 		file.close()
 		print("SAVED GAME TO SLOT ", current_slot)
+	else:
+		push_error("SaveManager: Failed to write save file: " + path)
 
 
 func load_game(slot: int) -> bool:
@@ -79,10 +93,30 @@ func load_game(slot: int) -> bool:
 		file.close()
 
 		var json := JSON.new()
-		if json.parse(json_string) == OK:
-			save_data = json.data
+		if json.parse(json_string) == OK and json.data is Dictionary:
+			var loaded_dict: Dictionary = json.data
+			# Ensure essential fields have safe defaults and valid values
+			if not loaded_dict.has("hp") or not (loaded_dict["hp"] is int or loaded_dict["hp"] is float) or not is_finite(float(loaded_dict["hp"])):
+				loaded_dict["hp"] = 100
+			else:
+				loaded_dict["hp"] = clamp(int(loaded_dict["hp"]), 0, 9999)
+
+			if not loaded_dict.has("potion_count") or not (loaded_dict["potion_count"] is int or loaded_dict["potion_count"] is float) or not is_finite(float(loaded_dict["potion_count"])):
+				loaded_dict["potion_count"] = 1
+			else:
+				loaded_dict["potion_count"] = max(0, int(loaded_dict["potion_count"]))
+
+			if not loaded_dict.has("current_scene") or not (loaded_dict["current_scene"] is String) or loaded_dict["current_scene"] == "" or not ResourceLoader.exists(loaded_dict["current_scene"]):
+				loaded_dict["current_scene"] = default_start_scene
+
+			if not loaded_dict.has("equipped_charms") or not (loaded_dict["equipped_charms"] is Array):
+				loaded_dict["equipped_charms"] = []
+
+			save_data = loaded_dict
 			print("LOADED GAME FROM SLOT ", slot)
 			return true
+		else:
+			push_warning("SaveManager: Failed to parse valid save Dictionary from: " + path)
 
 	return false
 
@@ -109,7 +143,7 @@ func get_slot_info(slot: int) -> Dictionary:
 			file.close()
 
 			var json := JSON.new()
-			if json.parse(json_string) == OK:
+			if json.parse(json_string) == OK and json.data is Dictionary:
 				return json.data
 
 	return {}

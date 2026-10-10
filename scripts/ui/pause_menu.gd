@@ -73,6 +73,19 @@ func _on_language_changed(_lang: String) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 
 	if event.is_action_pressed("ui_cancel"): # ปุ่ม ESC
+		if SceneTransition.is_transitioning:
+			return
+		# ห้าม toggle pause ถ้ากำลังมีบทสนทนา (DialogManager กำลังทำงาน)
+		if has_node("/root/DialogManager"):
+			var dm = get_node("/root/DialogManager")
+			if dm.is_dialog_active:
+				return
+		# ห้าม toggle pause ถ้าหน้า Game Over กำลังแสดง
+		var parent = get_parent()
+		if parent:
+			var game_over = parent.get_node_or_null("GameOverMenu")
+			if game_over and game_over.has_node("Control") and game_over.get_node("Control").visible:
+				return
 		toggle_pause()
 
 
@@ -112,7 +125,14 @@ func _on_save_button_pressed() -> void:
 
 func _on_main_menu_button_pressed() -> void:
 
+	if SceneTransition.is_transitioning:
+		return
+
+	control.hide()
 	get_tree().paused = false
+	SaveManager.is_respawning = false
+	SceneTransition.target_spawn_id = ""
+	SceneTransition.player_velocity = Vector2.ZERO
 
 	if main_menu_scene != "" and ResourceLoader.exists(main_menu_scene):
 		SceneTransition.change_scene(main_menu_scene, 0.5)

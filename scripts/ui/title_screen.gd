@@ -5,7 +5,7 @@ var transitioning := false
 # =========================================================
 # BGM
 # =========================================================
-var title_music: AudioStream = preload("res://assets/audio/bgm/sound_main.mp3")
+var title_music: AudioStream = preload("res://Assets/audio/bgm/sound_main.mp3")
 
 
 func _ready() -> void:

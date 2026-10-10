@@ -71,7 +71,7 @@ func _begin_intro() -> void:
 			dm.npc_name = lm.t("BOSS_NAME")
 			var intro_text1 = lm.get_dynamic_text("boss_intro_1")
 			var intro_text2 = lm.get_dynamic_text("boss_intro_2")
-			if intro_text1:
+			if intro_text1 and intro_text2:
 				intro_dialog = [
 					{"speaker": "Player", "text": "..."},
 					{"speaker": "Boss", "text": intro_text1},
@@ -80,6 +80,14 @@ func _begin_intro() -> void:
 				]
 		else:
 			dm.npc_name = "THE PURPLE BRUTE"
+
+		if intro_dialog.is_empty():
+			intro_dialog = [
+				{"speaker": "Player", "text": "..."},
+				{"speaker": "Boss", "text": "You dare challenge me, weakling?"},
+				{"speaker": "Player", "text": "!"},
+				{"speaker": "Boss", "text": "I will crush you to dust!"}
+			]
 			
 		dm.npc_portrait_emoji = "👹"
 		dm.dialog_finished.connect(_on_intro_dialog_finished, CONNECT_ONE_SHOT)

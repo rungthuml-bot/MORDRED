@@ -86,6 +86,10 @@ func _on_player_died() -> void:
 
 func _on_retry_button_pressed() -> void:
 
+	if SceneTransition.is_transitioning:
+		return
+
+	control.hide()
 	# ปลด Pause ก่อน
 	get_tree().paused = false
 	
@@ -94,7 +98,7 @@ func _on_retry_button_pressed() -> void:
 	
 	# หาสถานที่ Checkpoint
 	var target_scene: String = SaveManager.save_data.get("checkpoint_scene", "")
-	if target_scene == "":
+	if target_scene == "" or not ResourceLoader.exists(target_scene):
 		target_scene = SaveManager.save_data.get("current_scene", "")
 		
 	if target_scene != "" and ResourceLoader.exists(target_scene):
@@ -105,10 +109,17 @@ func _on_retry_button_pressed() -> void:
 
 func _on_main_menu_button_pressed() -> void:
 
+	if SceneTransition.is_transitioning:
+		return
+
+	control.hide()
 	# ปลด Pause ก่อนกลับหน้า Main Menu
 	get_tree().paused = false
+	SaveManager.is_respawning = false
+	SceneTransition.target_spawn_id = ""
+	SceneTransition.player_velocity = Vector2.ZERO
 
 	if main_menu_scene != "" and ResourceLoader.exists(main_menu_scene):
-		get_tree().change_scene_to_file(main_menu_scene)
+		SceneTransition.change_scene(main_menu_scene, 0.5)
 	else:
 		print("ERROR: Cannot find main_menu_scene")

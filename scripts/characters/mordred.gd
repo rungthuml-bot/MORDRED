@@ -64,6 +64,7 @@ const HEAVY_MAX_CHARGE := 2.0
 
 var combo := 0
 var attack_queued := false
+var current_attack_hit_targets: Array[Node] = []
 
 
 # ==================================================
@@ -123,6 +124,10 @@ func _ready() -> void:
 	update_stats_from_charms()
 	load_player_data()
 
+	if SceneTransition.player_velocity != Vector2.ZERO:
+		velocity = SceneTransition.player_velocity
+		SceneTransition.player_velocity = Vector2.ZERO
+
 	call_deferred("emit_initial_ui_signals")
 
 
@@ -172,9 +177,14 @@ func _physics_process(delta: float) -> void:
 	apply_gravity(delta)
 
 	var direction := Input.get_axis(
-		"Left",
-		"Right"
+		"move_left",
+		"move_right"
 	)
+	if direction == 0.0:
+		direction = Input.get_axis(
+			"Left",
+			"Right"
+		)
 
 	process_movement(direction, delta)
 	process_facing(direction)
@@ -387,7 +397,7 @@ func process_movement(
 	# Speed
 	var speed := walk_speed
 
-	if Input.is_key_pressed(KEY_SHIFT):
+	if Input.is_action_pressed("sprint") or Input.is_key_pressed(KEY_SHIFT):
 
 		speed = run_speed
 
@@ -447,7 +457,7 @@ func process_jump() -> void:
 
 
 	if (
-		Input.is_action_just_pressed("Jump")
+		(Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("Jump"))
 		and is_on_floor()
 	):
 
@@ -461,16 +471,22 @@ func process_jump() -> void:
 func process_inputs(delta: float) -> void:
 
 	# Potion
-	if Input.is_key_pressed(KEY_H):
+	if Input.is_action_just_pressed("use_potion"):
 
 		use_potion()
+
+
+	# Dash
+	if Input.is_action_just_pressed("dash"):
+
+		start_dash()
 
 
 	# ==================================================
 	# Heavy Attack Charge
 	# ==================================================
 
-	if Input.is_mouse_button_pressed(
+	if Input.is_action_pressed("attack_heavy") or Input.is_mouse_button_pressed(
 		MOUSE_BUTTON_RIGHT
 	):
 
@@ -590,7 +606,7 @@ func process_inputs(delta: float) -> void:
 	# Attack
 	# ==================================================
 
-	if Input.is_action_just_pressed("Attack"):
+	if Input.is_action_just_pressed("Attack") or Input.is_action_just_pressed("attack_light"):
 
 		handle_attack_input()
 
@@ -599,8 +615,9 @@ func process_inputs(delta: float) -> void:
 	# Shift: Tap for Slide, Hold for Run
 	# ==================================================
 
-	var shift_pressed := Input.is_key_pressed(
-		KEY_SHIFT
+	var shift_pressed := (
+		Input.is_action_pressed("sprint")
+		or Input.is_key_pressed(KEY_SHIFT)
 	)
 
 
@@ -697,11 +714,13 @@ func start_attack() -> void:
 		combo = 1
 
 		attack_queued = false
+		current_attack_hit_targets.clear()
 
 	else:
 
 		# Combo ต่อ
 		combo += 1
+		current_attack_hit_targets.clear()
 
 
 	if combo <= 4:
@@ -727,6 +746,7 @@ func start_heavy_attack() -> void:
 	combo = 1
 
 	attack_queued = false
+	current_attack_hit_targets.clear()
 
 
 	# Bonus multiplier based on charge time
@@ -765,14 +785,16 @@ func cancel_attack() -> void:
 	attack_queued = false
 
 	combo = 0
+	current_attack_hit_targets.clear()
 
 	update_stats_from_charms()
 
 
-	attack_collision.set_deferred(
-		"disabled",
-		true
-	)
+	if attack_collision != null:
+		attack_collision.set_deferred(
+			"disabled",
+			true
+		)
 
 
 # ==================================================
@@ -975,12 +997,24 @@ func _deal_damage(
 	enemy: Node
 ) -> void:
 
-	if enemy == null:
+	if enemy == null or not is_attacking or is_dead:
+
+		return
+
+
+	if enemy == self or enemy.is_in_group("player") or enemy.is_in_group("interactable"):
+
+		return
+
+
+	if enemy in current_attack_hit_targets:
 
 		return
 
 
 	if enemy.has_method("take_damage"):
+
+		current_attack_hit_targets.append(enemy)
 
 		enemy.take_damage(
 			int(10 * attack_multiplier)
@@ -1003,7 +1037,7 @@ func take_damage(
 	source_position_x: float = 0.0
 ) -> void:
 
-	if is_dead or is_invincible:
+	if is_dead or is_invincible or amount <= 0:
 
 		return
 
@@ -1134,6 +1168,7 @@ func die() -> void:
 
 	attack_queued = false
 	combo = 0
+	current_attack_hit_targets.clear()
 
 
 	# หยุดเสียง Charge
@@ -1199,40 +1234,6 @@ func update_stats_from_charms() -> void:
 		max_hp
 	)
 
-func _input(
-	event: InputEvent
-) -> void:
-
-	if (
-		event is InputEventKey
-		and event.pressed
-		and event.keycode == KEY_E
-	):
-
-		_try_interact()
-
-
-func _try_interact() -> void:
-
-	var interactables = (
-		get_tree().get_nodes_in_group(
-			"interactable"
-		)
-	)
-
-
-	for node in interactables:
-
-		if (
-			node.has_method("interact")
-			and global_position.distance_to(
-				node.global_position
-			) < 80.0
-		):
-
-			node.interact()
-
-			return
 
 
 # ==================================================
@@ -1596,66 +1597,50 @@ func load_player_data() -> void:
 
 	# Position
 	var has_position := false
-
 	var spawn_position := Vector2.ZERO
+	var current_scene_path := ""
+	if get_tree().current_scene != null:
+		current_scene_path = get_tree().current_scene.scene_file_path
 
+	var checkpoint_scene = SaveManager.save_data.get("checkpoint_scene", "")
+	var saved_current_scene = SaveManager.save_data.get("current_scene", "")
 
-	if (
-		SaveManager.save_data.has(
-			"checkpoint_pos_x"
-		)
+	# Strict scene ownership: checkpoint is only valid if non-empty and matching this scene
+	var is_checkpoint_valid: bool = (checkpoint_scene is String and checkpoint_scene != "" and checkpoint_scene == current_scene_path)
+	var is_saved_pos_valid: bool = (saved_current_scene is String and saved_current_scene != "" and saved_current_scene == current_scene_path)
+	var is_door_transition: bool = (SceneTransition.target_spawn_id != "")
 
-		and
-
-		SaveManager.save_data.has(
-			"checkpoint_pos_y"
-		)
-	):
-
+	if not is_door_transition and is_checkpoint_valid and _has_valid_coords("checkpoint_pos_x", "checkpoint_pos_y"):
 		spawn_position = Vector2(
-
-			SaveManager.save_data[
-				"checkpoint_pos_x"
-			],
-
-			SaveManager.save_data[
-				"checkpoint_pos_y"
-			]
-
+			float(SaveManager.save_data["checkpoint_pos_x"]),
+			float(SaveManager.save_data["checkpoint_pos_y"])
 		)
-
 		has_position = true
-
-
-	elif (
-		SaveManager.save_data.has("pos_x")
-
-		and
-
-		SaveManager.save_data.has("pos_y")
-	):
-
+	elif not is_door_transition and is_saved_pos_valid and _has_valid_coords("pos_x", "pos_y"):
 		spawn_position = Vector2(
-
-			SaveManager.save_data[
-				"pos_x"
-			],
-
-			SaveManager.save_data[
-				"pos_y"
-			]
-
+			float(SaveManager.save_data["pos_x"]),
+			float(SaveManager.save_data["pos_y"])
 		)
-
 		has_position = true
-
 
 	if has_position:
-
 		call_deferred(
 			"_apply_saved_position",
 			spawn_position
 		)
+
+
+func _has_valid_coords(key_x: String, key_y: String) -> bool:
+
+	if not SaveManager.save_data.has(key_x) or not SaveManager.save_data.has(key_y):
+		return false
+	var vx = SaveManager.save_data[key_x]
+	var vy = SaveManager.save_data[key_y]
+	if not (vx is int or vx is float) or not (vy is int or vy is float):
+		return false
+	var fx := float(vx)
+	var fy := float(vy)
+	return is_finite(fx) and is_finite(fy)
 
 
 # ==================================================
@@ -1724,23 +1709,16 @@ func update_checkpoint() -> void:
 
 func save_player_data() -> void:
 
-	SaveManager.save_data[
-		"hp"
-	] = hp
-
-
-	SaveManager.save_data[
-		"potion_count"
-	] = potion_count
-
+	SaveManager.save_data["hp"] = hp
+	SaveManager.save_data["potion_count"] = potion_count
+	SaveManager.save_data["pos_x"] = global_position.x
+	SaveManager.save_data["pos_y"] = global_position.y
 
 	if get_tree().current_scene != null:
-
 		SaveManager.save_data[
 			"current_scene"
 		] = (
 			get_tree().current_scene.scene_file_path
 		)
-
 
 	SaveManager.save_game()

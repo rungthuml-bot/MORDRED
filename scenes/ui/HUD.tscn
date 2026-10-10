@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://x2frsprdyi68"]
 
 [ext_resource type="Script" uid="uid://capwk0bdmhrou" path="res://scripts/ui/hud.gd" id="1_qpvh6"]
-[ext_resource type="Texture2D" uid="uid://bds0ay46a7y5q" path="res://assets/game/ChatGPT_Image_1_ก.ย._2569_03_45_09-removebg-preview (1).png" id="2_potion"]
+[ext_resource type="Texture2D" uid="uid://bds0ay46a7y5q" path="res://Assets/game/ChatGPT_Image_1_ก.ย._2569_03_45_09-removebg-preview (1).png" id="2_potion"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.02, 0.02, 0.02, 1)

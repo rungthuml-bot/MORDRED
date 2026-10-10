@@ -10,7 +10,7 @@ extends Control
 # =========================================================
 # BGM
 # =========================================================
-var title_music: AudioStream = preload("res://assets/audio/bgm/sound_main.mp3")
+var title_music: AudioStream = preload("res://Assets/audio/bgm/sound_main.mp3")
 
 
 # =========================================================
@@ -72,6 +72,9 @@ func _on_language_changed(_lang: String) -> void:
 
 func _on_start_button_pressed() -> void:
 
+	if SceneTransition.is_transitioning:
+		return
+
 	# เปลี่ยนไปยังหน้าเลือก Save Profile (SaveSelectMenu)
 	if save_select_scene != "" and ResourceLoader.exists(save_select_scene):
 		SceneTransition.change_scene(save_select_scene, 0.5)
@@ -80,9 +83,13 @@ func _on_start_button_pressed() -> void:
 
 
 func _on_options_button_pressed() -> void:
+	if SceneTransition.is_transitioning:
+		return
 	SceneTransition.change_scene("res://scenes/ui/Settings.tscn", 0.5)
 
 func _on_credits_button_pressed() -> void:
+	if SceneTransition.is_transitioning:
+		return
 	SceneTransition.change_scene("res://scenes/ui/Credits.tscn", 0.5)
 
 func _on_exit_button_pressed() -> void:
