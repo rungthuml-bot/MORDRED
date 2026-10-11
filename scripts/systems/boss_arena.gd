@@ -65,35 +65,29 @@ func _begin_intro() -> void:
 	
 	# ตั้งค่า DialogManager ให้แสดงชื่อบอส
 	var dm = get_tree().root.get_node_or_null("DialogManager")
-	if dm:
+	if dm and not dm.is_dialog_active:
 		var lm = get_tree().root.get_node_or_null("LocaleManager")
 		if lm:
 			dm.npc_name = lm.t("BOSS_NAME")
 			var intro_text1 = lm.get_dynamic_text("boss_intro_1")
 			var intro_text2 = lm.get_dynamic_text("boss_intro_2")
-			if intro_text1 and intro_text2:
+			if not intro_text1.is_empty() and not intro_text2.is_empty():
 				intro_dialog = [
 					{"speaker": "Player", "text": "..."},
 					{"speaker": "Boss", "text": intro_text1},
 					{"speaker": "Player", "text": "!"},
 					{"speaker": "Boss", "text": intro_text2},
 				]
-		else:
-			dm.npc_name = "THE PURPLE BRUTE"
 
-		if intro_dialog.is_empty():
-			intro_dialog = [
-				{"speaker": "Player", "text": "..."},
-				{"speaker": "Boss", "text": "You dare challenge me, weakling?"},
-				{"speaker": "Player", "text": "!"},
-				{"speaker": "Boss", "text": "I will crush you to dust!"}
-			]
-			
-		dm.npc_portrait_emoji = "👹"
-		dm.dialog_finished.connect(_on_intro_dialog_finished, CONNECT_ONE_SHOT)
-		dm.start_dialog(intro_dialog)
+		if not intro_dialog.is_empty():
+			dm.npc_portrait_emoji = "👹"
+			dm.dialog_finished.connect(_on_intro_dialog_finished, CONNECT_ONE_SHOT)
+			dm.start_dialog(intro_dialog)
+		else:
+			# ถ้าไม่มีบทสนทนาที่แปลไว้ ให้เริ่มการต่อสู้ทันทีโดยข้าม intro
+			_start_fight()
 	else:
-		# ถ้าไม่มี DialogManager ก็ข้ามไปสู้เลย
+		# ถ้าไม่มี DialogManager หรือติดบทสนทนาอื่นอยู่ ก็ข้ามไปสู้เลย
 		_start_fight()
 
 func _on_intro_dialog_finished() -> void:
