@@ -42,7 +42,22 @@ corner_radius_bottom_left = 2
 content_margin_top = 4.0
 content_margin_bottom = 4.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slider_focus"]
+bg_color = Color(0.1, 0.1, 0.14, 1.0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.95, 0.82, 0.35, 0.85)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+
 [sub_resource type="Theme" id="Theme_slider"]
+HSlider/styles/focus = SubResource("StyleBoxFlat_slider_focus")
 HSlider/styles/slider = SubResource("StyleBoxFlat_slider_track")
 HSlider/styles/grabber_area = SubResource("StyleBoxFlat_slider_fill")
 HSlider/styles/grabber_area_highlight = SubResource("StyleBoxFlat_slider_fill")
@@ -81,6 +96,24 @@ content_margin_bottom = 4.0
 shadow_color = Color(0.83, 0.68, 0.21, 0.08)
 shadow_size = 6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keybtn_focus"]
+bg_color = Color(0.12, 0.11, 0.16, 1.0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.82, 0.35, 0.95)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+content_margin_left = 14.0
+content_margin_top = 4.0
+content_margin_right = 14.0
+content_margin_bottom = 4.0
+shadow_color = Color(0.95, 0.82, 0.35, 0.2)
+shadow_size = 6
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keybtn_pressed"]
 bg_color = Color(0.04, 0.04, 0.06, 1.0)
 border_width_left = 1
@@ -103,7 +136,7 @@ Button/colors/font_focus_color = Color(1, 0.96, 0.85, 1)
 Button/colors/font_hover_color = Color(1, 0.96, 0.85, 1)
 Button/colors/font_pressed_color = Color(0.7, 0.65, 0.55, 1)
 Button/font_sizes/font_size = 22
-Button/styles/focus = SubResource("StyleBoxEmpty_focus")
+Button/styles/focus = SubResource("StyleBoxFlat_keybtn_focus")
 Button/styles/hover = SubResource("StyleBoxFlat_keybtn_hover")
 Button/styles/normal = SubResource("StyleBoxFlat_keybtn_normal")
 Button/styles/pressed = SubResource("StyleBoxFlat_keybtn_pressed")
@@ -142,6 +175,24 @@ expand_margin_bottom = 6.0
 shadow_color = Color(0.83, 0.68, 0.21, 0.1)
 shadow_size = 8
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_focus"]
+bg_color = Color(0.1, 0.1, 0.14, 0.85)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.82, 0.35, 0.95)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+expand_margin_left = 20.0
+expand_margin_top = 6.0
+expand_margin_right = 20.0
+expand_margin_bottom = 6.0
+shadow_color = Color(0.95, 0.82, 0.35, 0.2)
+shadow_size = 6
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
 bg_color = Color(0.02, 0.02, 0.04, 0.9)
 border_width_left = 1
@@ -164,7 +215,7 @@ Button/colors/font_focus_color = Color(1, 0.96, 0.85, 1)
 Button/colors/font_hover_color = Color(1, 0.96, 0.85, 1)
 Button/colors/font_pressed_color = Color(0.7, 0.65, 0.55, 1)
 Button/font_sizes/font_size = 28
-Button/styles/focus = SubResource("StyleBoxEmpty_focus")
+Button/styles/focus = SubResource("StyleBoxFlat_btn_focus")
 Button/styles/hover = SubResource("StyleBoxFlat_btn_hover")
 Button/styles/normal = SubResource("StyleBoxFlat_btn_normal")
 Button/styles/pressed = SubResource("StyleBoxFlat_btn_pressed")

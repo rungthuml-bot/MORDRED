@@ -31,6 +31,8 @@ func _ready() -> void:
 		if lines and lines.size() >= 4:
 			story_label.text = lines[0] + "\n" + lines[1] + "\n" + lines[2]
 			author_label.text = "- " + lines[3] + " -"
+		if has_node("Background/ContinueHint"):
+			$Background/ContinueHint.text = lm.t("SKIP_INTRO")
 	
 	play_story_sequence()
 

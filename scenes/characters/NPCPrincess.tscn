@@ -14,6 +14,18 @@ size = Vector2(32, 70)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_interact"]
 size = Vector2(120, 80)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prompt"]
+bg_color = Color(0.04, 0.04, 0.07, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.5, 0.42, 0.25, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_ffqpw"]
 atlas = ExtResource("2_45hi6")
 region = Rect2(0, 0, 55, 44)
@@ -74,13 +86,21 @@ shape = SubResource("RectangleShape2D_body")
 
 [node name="PromptLabel" type="Label" parent="." unique_id=1417447881]
 visible = false
-offset_left = -40.0
-offset_top = -65.0
-offset_right = -40.0
-offset_bottom = -65.0
+offset_left = -60.0
+offset_top = -70.0
+offset_right = 60.0
+offset_bottom = -46.0
+theme_override_colors/font_color = Color(0.95, 0.9, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.9)
+theme_override_colors/font_outline_color = Color(0.1, 0.05, 0.15, 0.9)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_prompt")
 text = "[T] TALK"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="InteractionArea" type="Area2D" parent="." unique_id=773549195]
 collision_layer = 0

@@ -25,6 +25,9 @@ var translations: Dictionary = {
 		"CONTINUE": "CONTINUE",
 		"DELETE": "DELETE",
 		"BACK": "BACK",
+		"CORRUPTED": "CORRUPTED",
+		"CANNOT_LOAD": "(Cannot Load)",
+		"SKIP_INTRO": "— PRESS ANY KEY TO SKIP —",
 		
 		# Pause Menu
 		"PAUSED": "PAUSED",
@@ -97,6 +100,9 @@ var translations: Dictionary = {
 		"CONTINUE": "เล่นต่อ",
 		"DELETE": "ลบ",
 		"BACK": "กลับ",
+		"CORRUPTED": "ไฟล์เสียหาย",
+		"CANNOT_LOAD": "(ไม่สามารถโหลดได้)",
+		"SKIP_INTRO": "— กดปุ่มใดก็ได้เพื่อข้าม —",
 		
 		# Pause Menu
 		"PAUSED": "หยุดชั่วคราว",

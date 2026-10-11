@@ -100,7 +100,13 @@ func update_slot_buttons() -> void:
 			var data = SaveManager.get_slot_info(slot_number)
 			if data.is_empty():
 				# ไฟล์มีอยู่จริงแต่เสียหายหรือไม่สามารถอ่านได้
-				btn.text = "PROFILE " + str(slot_number) + "\n\nCORRUPTED\n\n(Cannot Load)"
+				var corrupted_title = "CORRUPTED"
+				var cannot_load_text = "(Cannot Load)"
+				if has_node("/root/LocaleManager"):
+					var lm = get_node("/root/LocaleManager")
+					corrupted_title = lm.t("CORRUPTED")
+					cannot_load_text = lm.t("CANNOT_LOAD")
+				btn.text = "PROFILE " + str(slot_number) + "\n\n" + corrupted_title + "\n\n" + cannot_load_text
 			else:
 				var hp: int = data.get("hp", 100)
 				var potions: int = data.get("potion_count", 0)
