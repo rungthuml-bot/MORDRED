@@ -9,6 +9,8 @@ var ui_hover_sound: AudioStream = preload("res://Assets/audio/bgm/666herohero-cl
 var transition_impact_sound: AudioStream = preload("res://Assets/audio/bgm/lordsonny-cinematic-boom-171285.mp3")
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
 	music_player = AudioStreamPlayer.new()
 	add_child(music_player)
 	
@@ -51,6 +53,13 @@ func _connect_buttons(node: Node) -> void:
 		_connect_buttons(child)
 
 func play_music(stream: AudioStream) -> void:
+	if stream == null:
+		stop_music()
+		return
+
+	if music_player == null:
+		return
+
 	if music_player.stream == stream and music_player.playing:
 		return
 
@@ -58,16 +67,20 @@ func play_music(stream: AudioStream) -> void:
 	music_player.play()
 
 func stop_music() -> void:
-	music_player.stop()
+	if music_player != null and music_player.playing:
+		music_player.stop()
 
 func play_ui_click() -> void:
-	ui_player.stream = ui_click_sound
-	ui_player.play()
+	if ui_player != null and ui_click_sound != null:
+		ui_player.stream = ui_click_sound
+		ui_player.play()
 
 func play_ui_hover() -> void:
-	ui_hover_player.stream = ui_hover_sound
-	ui_hover_player.play()
+	if ui_hover_player != null and ui_hover_sound != null:
+		ui_hover_player.stream = ui_hover_sound
+		ui_hover_player.play()
 
 func play_transition_impact() -> void:
-	transition_player.stream = transition_impact_sound
-	transition_player.play()
+	if transition_player != null and transition_impact_sound != null:
+		transition_player.stream = transition_impact_sound
+		transition_player.play()

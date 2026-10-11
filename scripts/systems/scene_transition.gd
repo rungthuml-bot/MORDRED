@@ -34,6 +34,11 @@ func change_scene(target_path: String, fade_duration: float = 0.5, spawn_id: Str
 	# บล็อกการกดปุ่มระหว่างเปลี่ยนฉาก
 	color_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 	
+	# หยุดเพลงเมนูทันทีเมื่อเริ่มเปลี่ยนเข้าสู่ฉากด่าน
+	if target_path.begins_with("res://scenes/levels/"):
+		if has_node("/root/AudioManager"):
+			get_node("/root/AudioManager").stop_music()
+
 	# 1. Fade Out (จอดำค่อยๆ สว่างขึ้นมาทับ)
 	var tween_out := create_tween()
 	tween_out.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)

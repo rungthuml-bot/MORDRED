@@ -1524,21 +1524,20 @@ func process_camera_shake(
 			SHAKE_DECAY * delta
 		)
 
-
-		camera.offset = Vector2(
-
-			randf_range(
-				-shake_intensity,
-				shake_intensity
-			),
-
-			randf_range(
-				-shake_intensity,
-				shake_intensity
+		if shake_intensity < 0.1:
+			shake_intensity = 0.0
+			camera.offset = Vector2.ZERO
+		else:
+			camera.offset = Vector2(
+				randf_range(
+					-shake_intensity,
+					shake_intensity
+				),
+				randf_range(
+					-shake_intensity,
+					shake_intensity
+				)
 			)
-
-		)
-
 
 	else:
 

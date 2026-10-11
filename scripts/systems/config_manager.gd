@@ -60,7 +60,11 @@ func load_settings() -> void:
 		return
 	
 	# Load volume
-	master_volume = config.get_value("audio", "master_volume", 100.0)
+	var loaded_vol = config.get_value("audio", "master_volume", 100.0)
+	if loaded_vol is int or loaded_vol is float:
+		master_volume = clampf(float(loaded_vol), 0.0, 100.0)
+	else:
+		master_volume = 100.0
 	
 	# Load language
 	language = config.get_value("general", "language", "en")
@@ -70,7 +74,7 @@ func load_settings() -> void:
 # =========================================================
 
 func set_master_volume(value: float) -> void:
-	master_volume = value
+	master_volume = clampf(value, 0.0, 100.0)
 	apply_volume()
 	save_settings()
 
@@ -81,6 +85,8 @@ func set_language(lang: String) -> void:
 
 func apply_volume() -> void:
 	var bus_index = AudioServer.get_bus_index("Master")
+	if bus_index < 0:
+		return
 	if master_volume <= 0.0:
 		AudioServer.set_bus_mute(bus_index, true)
 	else:
